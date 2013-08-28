@@ -106,11 +106,12 @@ namespace Afinity
             //RawStatsUnitTest.Run();
 
             //Tests.Run();
-            //Tests.DrownCatPeptidesWithAllProteins();
+            NBSample.Launch();
+            //Tests.YangLiuPeptidesWithAllProteins();
             //Tests.LysineConservation();
             //NoEnzymeDigestUnitTest.Run();
             //Instance.MhcSampleTest(null); 
-            Instance.YeastSampleTest(null);
+            //Instance.YeastSampleTest(null);
             //Tests.LysineConservation();
             //Tests.MascotCompare();
 
