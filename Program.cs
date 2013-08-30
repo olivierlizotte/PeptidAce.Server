@@ -106,7 +106,8 @@ namespace Afinity
             //RawStatsUnitTest.Run();
 
             //Tests.Run();
-            NBSample.Launch();
+            NBSample.TestMaxFlow();
+            //NBSample.Launch();
             //Tests.YangLiuPeptidesWithAllProteins();
             //Tests.LysineConservation();
             //NoEnzymeDigestUnitTest.Run();
