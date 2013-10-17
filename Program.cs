@@ -105,9 +105,20 @@ namespace Afinity
 
             //RawStatsUnitTest.Run();
 
+            //Trinity.UnitTest.RT_MHC.Launch();
             //Tests.Run();
-            NBSample.TestMaxFlow();
-            //NBSample.Launch();
+            //Instance.SettePeptideSampleTest(null);
+            //NBSample.TestMaxFlow();
+
+            //Trinity.Methods.RawRtExtractor.FromFolderToCSV(@"G:\Thibault\-=Proteomics_Raw_Data=-\Tyers_ProhitsStorage\LTQORBITRAPXL\BSA_cross-links_P8\NOV09_2012\");
+            /*Trinity.Methods.AddRtToMascotReport.FromFolderWithRetentionTimeCSV(@"G:\Thibault\-=Proteomics_Raw_Data=-\Tyers_ProhitsStorage\LTQORBITRAPXL\BSA_cross-links_P8\NOV09_2012\noRT_test\Xi_xlinks-MascotReport_noRT.csv",
+                                                                               @"G:\Thibault\-=Proteomics_Raw_Data=-\Tyers_ProhitsStorage\LTQORBITRAPXL\BSA_cross-links_P8\NOV09_2012\PeptideMaps\50000",
+                                                                               @"G:\Thibault\-=Proteomics_Raw_Data=-\Tyers_ProhitsStorage\LTQORBITRAPXL\BSA_cross-links_P8\NOV09_2012\noRT_test\Xi_xlinks-MascotReport_noRT_WithRT.csv");
+                                                                     //*/
+
+            ToCalibrate.Launch();
+            //NBSample.MaxFlowThis2();
+            //NBSample.Launch2();
             //Tests.YangLiuPeptidesWithAllProteins();
             //Tests.LysineConservation();
             //NoEnzymeDigestUnitTest.Run();
