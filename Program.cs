@@ -74,7 +74,7 @@ namespace Afinity
     /// <summary>
     /// Main class with websocket initialisation. Also creates a ConSole object to handle log files generation and 
     /// </summary>
-    class TrinityMain
+    public class TrinityMain
     {
         /// <summary>
         /// Store the list of online users. Wish I had a ConcurrentList. 
@@ -110,13 +110,18 @@ namespace Afinity
             //Instance.SettePeptideSampleTest(null);
             //NBSample.TestMaxFlow();
 
-            //Trinity.Methods.RawRtExtractor.FromFolderToCSV(@"G:\Thibault\-=Proteomics_Raw_Data=-\Tyers_ProhitsStorage\LTQORBITRAPXL\BSA_cross-links_P8\NOV09_2012\");
-            /*Trinity.Methods.AddRtToMascotReport.FromFolderWithRetentionTimeCSV(@"G:\Thibault\-=Proteomics_Raw_Data=-\Tyers_ProhitsStorage\LTQORBITRAPXL\BSA_cross-links_P8\NOV09_2012\noRT_test\Xi_xlinks-MascotReport_noRT.csv",
-                                                                               @"G:\Thibault\-=Proteomics_Raw_Data=-\Tyers_ProhitsStorage\LTQORBITRAPXL\BSA_cross-links_P8\NOV09_2012\PeptideMaps\50000",
-                                                                               @"G:\Thibault\-=Proteomics_Raw_Data=-\Tyers_ProhitsStorage\LTQORBITRAPXL\BSA_cross-links_P8\NOV09_2012\noRT_test\Xi_xlinks-MascotReport_noRT_WithRT.csv");
+//            Trinity.Methods.RawRtExtractor.FromFolderToCSV(@"G:\Thibault\-=Proteomics_Raw_Data=-\Tyers_ProhitsStorage\QEXACTIVE\Cdc34-Ubi\SEP12_2013\DSS\PeptidesMaps\100000\inter");
+            /*Trinity.Methods.AddRtToMascotReport.FromFolderWithRetentionTimeCSV(@"G:\Thibault\-=Proteomics_Raw_Data=-\Tyers_ProhitsStorage\QEXACTIVE\Cdc34-Ubi\SEP12_2013\DSS\PeptidesMaps\100000\inter\Cdc34-Ubi_DSS_2013-09-12_grouped_f2_fp0.01_intra-protein-cl.csv",
+                                                                               @"G:\Thibault\-=Proteomics_Raw_Data=-\Tyers_ProhitsStorage\QEXACTIVE\Cdc34-Ubi\SEP12_2013\DSS\",
+                                                                               @"G:\Thibault\-=Proteomics_Raw_Data=-\Tyers_ProhitsStorage\QEXACTIVE\Cdc34-Ubi\SEP12_2013\DSS\PeptidesMaps\100000\inter\Cdc34-Ubi_DSS_2013-09-12_grouped_f2_fp0.01_intra-protein-cl_WithRT.csv");
                                                                      //*/
 
-            ToCalibrate.Launch();
+            //IsomericPeptideQuantifier.OptimizeThisMaxFlow();
+            //IsomericPeptideQuantifier2.Optimize2();
+            //Tests.MatchPeptideToProtein();
+            //HistonePositionnalIsomer.Launch();
+            //PositionnalIsomerSolver.MaxFlowThis();
+            //ToCalibrate.Launch();
             //NBSample.MaxFlowThis2();
             //NBSample.Launch2();
             //Tests.YangLiuPeptidesWithAllProteins();
@@ -142,7 +147,7 @@ namespace Afinity
 
             Sol.WriteLine("Welcome to ConSOLe : the command line, server-side interface of Trinity!");
             Sol.WriteLine("Type in the commands you wish to be executed");
-
+            
             do
             {/*
                 if (!string.IsNullOrEmpty(command))
@@ -231,6 +236,22 @@ namespace Afinity
         }
 
         /// <summary>
+        /// Event fired when the Alchemy Websockets server instance sends data to a client.
+        /// Logs the data to the console and performs no further action.
+        /// </summary>
+        /// <param name="context">The user's connection context</param>
+        public static int SendToTerminal(string message, UserContext context)
+        {
+            var u = OnlineUsers.Keys.Where(o => o.ClientAddress == context.ClientAddress).Single();
+
+            //Properties
+            var r = new Response { Type = "Info", Message = message };
+
+            context.Send(JsonConvert.SerializeObject(r));
+            return 1;
+        }
+
+        /// <summary>
         /// Event fired when a client disconnects from the Alchemy Websockets server instance.
         /// Removes the user from the online users list and broadcasts the disconnection message
         /// to all connected users.
@@ -280,7 +301,7 @@ namespace Afinity
 
             if (ValidateName(name))
             {
-                Sol.CreateUserConSol(context, name);
+                Sol.CreateUserConSol(context, name, SendToTerminal);
 
                 r.Type = "Connection";
                 r.Data = new { name };
@@ -401,7 +422,24 @@ namespace Afinity
             public string Type { get; set; }
             public dynamic Data { get; set; }
             public dynamic Message { get; set; }
-        }        
+        }
+
+        private static Type GetClassType(string className, Type refType)
+        {
+            //Is the command a fullname class?
+            Type theType = refType.Assembly.GetType(className);
+
+            //Is the command a class in "Trinity" ?
+            if (theType == null)
+                theType = refType.Assembly.GetType("Trinity." + className);
+
+            //Is the command a class in another Trinity namespace?
+            if (theType == null)
+                foreach (Type tttype in refType.Assembly.GetTypes())
+                    if (tttype.Name.CompareTo(className) == 0)
+                        theType = tttype;
+            return theType;
+        }
 
         /// <summary>
         /// Launches, on a different thread, the method stored in "command". This method must be from the MenuFunctions class object
@@ -417,8 +455,63 @@ namespace Afinity
         {
             try
             {
-                Task t = Task.Factory.StartNew(() =>
+                Task task = Task.Factory.StartNew(() =>
                 {
+                    try
+                    {
+                        Type refType = typeof(Trinity.Peptide);
+                        string[] splits = command.Split(' ');
+
+                        //List all possible classes, filter by keyword (second param)
+                        if ("ls".CompareTo(splits[0]) == 0)
+                        {
+                            string strCommands = "";
+                            foreach (Type tttype in refType.Assembly.GetTypes())
+                                if(tttype.IsClass && tttype.IsPublic && (splits.Length == 1 || tttype.FullName.Contains(splits[1])))
+                                    strCommands += "\n" + tttype.Name;
+                            if(!string.IsNullOrEmpty(strCommands))
+                                SendToTerminal(strCommands.Substring(1), context);
+                        }
+                        else
+                        {
+                            string[] splitsDot = command.Split('.');
+                            int iterIndexSplit = 0;
+                            string className = splitsDot[iterIndexSplit];
+                            string methodName = "Launch";
+                            for (iterIndexSplit = 1; iterIndexSplit < splitsDot.Length - 1; iterIndexSplit++)
+                                className += "." + splitsDot[iterIndexSplit];
+
+                            Type theType = GetClassType(className, refType);
+                            if (theType == null)//No specified method, use default "Launch()" method
+                            {
+                                className += "." + splitsDot[iterIndexSplit];
+                                iterIndexSplit++;
+                                theType = GetClassType(className, refType);
+                            }
+                            
+                            if (theType != null)
+                            {
+                                System.Reflection.MethodInfo theMethod = null;
+                                if(iterIndexSplit < splitsDot.Length)
+                                    methodName = splitsDot[iterIndexSplit];
+                                
+                                theMethod = theType.GetMethod(methodName);
+                                
+                                if (theMethod != null)
+                                    theMethod.Invoke(Instance, new[] { Sol.GetConSolUser(context) });
+                                else
+                                    SendError("Could not find method " + className + "." + methodName + "(ConSolUser user)", context);
+                            }
+                            else
+                                SendError("Could not find class " + command, context);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        SendError("Could not run command", context);
+                    }//*/
+                        
+                    /*
                     try{
                         Type thisType = Instance.GetType();
                         System.Reflection.MethodInfo theMethod = thisType.GetMethod(command);
@@ -432,7 +525,7 @@ namespace Afinity
                     catch (Exception)
                     {
                         SendError("Could not run command", context);
-                    }
+                    }//*/
                 });
             }
             catch (Exception)

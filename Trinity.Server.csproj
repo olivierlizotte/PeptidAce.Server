@@ -55,6 +55,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Alchemy">
@@ -87,6 +88,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Proteomics.Utilities\Proteomics.Utilities.csproj">
+      <Project>{37EE0D82-2AE8-4212-A111-A0FACF576965}</Project>
+      <Name>Proteomics.Utilities</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Trinity.ConSol\Trinity.ConSol.csproj">
       <Project>{40AAE3FB-98BA-41EC-8120-DAF55D313285}</Project>
       <Name>Trinity.ConSol</Name>
