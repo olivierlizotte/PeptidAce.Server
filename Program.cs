@@ -131,8 +131,7 @@ namespace Afinity
             //Instance.YeastSampleTest(null);
             //Tests.LysineConservation();
             //Tests.MascotCompare();
-
-
+            
             // Initialize the server on port 81, accept any IPs, and bind events.
             var aServer = new WebSocketServer(81, IPAddress.Any)
             {
@@ -246,6 +245,22 @@ namespace Afinity
 
             //Properties
             var r = new Response { Type = "Info", Message = message };
+
+            context.Send(JsonConvert.SerializeObject(r));
+            return 1;
+        }
+
+        /// <summary>
+        /// Event fired when the Alchemy Websockets server instance sends data to a client.
+        /// Logs the data to the console and performs no further action.
+        /// </summary>
+        /// <param name="context">The user's connection context</param>
+        public static int SendDataToClient(object serializableObj, UserContext context)
+        {
+            var u = OnlineUsers.Keys.Where(o => o.ClientAddress == context.ClientAddress).Single();
+
+            //Properties
+            var r = new Response { Type = "Data", Data = serializableObj };
 
             context.Send(JsonConvert.SerializeObject(r));
             return 1;
@@ -496,11 +511,14 @@ namespace Afinity
                                     methodName = splitsDot[iterIndexSplit];
                                 
                                 theMethod = theType.GetMethod(methodName);
-                                
+                                object result = null;
                                 if (theMethod != null)
-                                    theMethod.Invoke(Instance, new[] { Sol.GetConSolUser(context) });
+                                    result = theMethod.Invoke(Instance, new[] { Sol.GetConSolUser(context) });
                                 else
                                     SendError("Could not find method " + className + "." + methodName + "(ConSolUser user)", context);
+
+                                if (result != null)
+                                    SendDataToClient(result, context);                                
                             }
                             else
                                 SendError("Could not find class " + command, context);
@@ -509,23 +527,7 @@ namespace Afinity
                     catch (Exception)
                     {
                         SendError("Could not run command", context);
-                    }//*/
-                        
-                    /*
-                    try{
-                        Type thisType = Instance.GetType();
-                        System.Reflection.MethodInfo theMethod = thisType.GetMethod(command);
-                        string output = theMethod.Invoke(Instance, new[] { context }) as string;
-                        if (!string.IsNullOrEmpty(output))
-                        {
-                            var r = new Response { Type = "Result", Message = output };
-                            context.Send(JsonConvert.SerializeObject(r));
-                        }
                     }
-                    catch (Exception)
-                    {
-                        SendError("Could not run command", context);
-                    }//*/
                 });
             }
             catch (Exception)
