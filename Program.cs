@@ -109,7 +109,7 @@ namespace Afinity
             //Tests.Run();
             //Instance.SettePeptideSampleTest(null);
             //NBSample.TestMaxFlow();
-
+                       
 //            Trinity.Methods.RawRtExtractor.FromFolderToCSV(@"G:\Thibault\-=Proteomics_Raw_Data=-\Tyers_ProhitsStorage\QEXACTIVE\Cdc34-Ubi\SEP12_2013\DSS\PeptidesMaps\100000\inter");
             /*Trinity.Methods.AddRtToMascotReport.FromFolderWithRetentionTimeCSV(@"G:\Thibault\-=Proteomics_Raw_Data=-\Tyers_ProhitsStorage\QEXACTIVE\Cdc34-Ubi\SEP12_2013\DSS\PeptidesMaps\100000\inter\Cdc34-Ubi_DSS_2013-09-12_grouped_f2_fp0.01_intra-protein-cl.csv",
                                                                                @"G:\Thibault\-=Proteomics_Raw_Data=-\Tyers_ProhitsStorage\QEXACTIVE\Cdc34-Ubi\SEP12_2013\DSS\",
@@ -218,9 +218,12 @@ namespace Afinity
             }
             catch (Exception e) // Bad JSON! For shame.
             {
-                var r = new Response { Type = "Error", Message = e.Message };
-
-                context.Send(JsonConvert.SerializeObject(r));
+                Console.WriteLine("Received uninterpretable data from " + context.ClientAddress);
+                if (context.DataFrame != null)
+                    Console.WriteLine(" => " + context.DataFrame.ToString());
+                //var r = new Response { Type = "Error", Message = e.Message };
+                //SendError(JsonConvert.SerializeObject(r), context);
+                //context.Send(JsonConvert.SerializeObject(r));
             }
         }
 
