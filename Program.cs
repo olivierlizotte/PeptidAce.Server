@@ -20,57 +20,15 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using Alchemy;
-using Alchemy.Classes;
 using Newtonsoft.Json;
 using System.Net;
 using System.Threading.Tasks;
 using System.Timers;
 using Trinity.UnitTest;
+using Fleck;
 
 namespace Afinity
 {
-    /// <summary>
-    /// This menu functions is used to give access to some function by sending commands through the websocket.
-    /// Originally, the ConSol offered full control over C# (you could send a real C# command, and it would get executed)
-    /// Now that ProteoProfile has been designed to run server side, remote code execution has been removed.
-    /// Only functions listed here will be executed, to prevent security flaws. Anything added here is automatically available
-    /// from the command line interface. 
-    /// TODO Remove ToString and other "object" class methods from the options listed by the ls command.
-    /// </summary>
-    public class MenuFunctions
-    {
-        public string YeastSampleTest(UserContext context)
-        {
-            YeastSample.Launch();
-            return "Yeast sample test executed!";
-        }
-
-        public string SettePeptideSampleTest(UserContext context)
-        {
-            SettePeptideSample.Launch();
-            return "Sette Peptide sample executed";
-        }
-
-        public string MhcSampleTest(UserContext context)
-        {
-            MhcSample.Launch();
-            return "Mhc sample test executed";
-        }
-
-        public string ls(UserContext context)
-        {
-            string output = "";
-            Type thisType = this.GetType();
-            System.Reflection.MethodInfo[] theMethods = thisType.GetMethods();
-            foreach (System.Reflection.MethodInfo method in theMethods)
-            {
-                output += ", " + method.Name;
-            }
-            return output.Substring(2);
-        }
-    }
-
     /// <summary>
     /// Main class with websocket initialisation. Also creates a ConSole object to handle log files generation and 
     /// </summary>
@@ -79,17 +37,17 @@ namespace Afinity
         /// <summary>
         /// Store the list of online users. Wish I had a ConcurrentList. 
         /// </summary>
-        protected static ConcurrentDictionary<UserContext, string> OnlineUsers = new ConcurrentDictionary<UserContext, string>();
+        //protected static ConcurrentDictionary<IWebSocketConnection, ConSolUser> OnlineUsers = new ConcurrentDictionary<IWebSocketConnection, ConSolUser>();
                 
         /// <summary>
         /// Console wrapper with integrated log files and command compiler (through reflection)
         /// </summary>
         public static ConSol Sol;
-        
+
         /// <summary>
-        /// Console wrapper with integrated log files and command compiler (through reflection)
+        /// Pointer to an instance of the main class
         /// </summary>
-        public static MenuFunctions Instance = new MenuFunctions();
+        public static TrinityMain Instance = new TrinityMain();
 
         /// <summary>
         /// Initialize the application and start the Alchemy Websockets server
@@ -97,53 +55,26 @@ namespace Afinity
         /// <param name="args"></param>
         static void Main(string[] args)
         {
-            //Start SOL
-
-            //Console <controller>
-            Sol = new ConSol();// = new vsConSOLe(new UpdateMethod(UpdateMethodHandler));                        
+            Sol = new ConSol();                    
             string command = "";
 
-            //RawStatsUnitTest.Run();
-
-            //Trinity.UnitTest.RT_MHC.Launch();
-            //Tests.Run();
-            //Instance.SettePeptideSampleTest(null);
-            //NBSample.TestMaxFlow();
-                       
-//            Trinity.Methods.RawRtExtractor.FromFolderToCSV(@"G:\Thibault\-=Proteomics_Raw_Data=-\Tyers_ProhitsStorage\QEXACTIVE\Cdc34-Ubi\SEP12_2013\DSS\PeptidesMaps\100000\inter");
-            /*Trinity.Methods.AddRtToMascotReport.FromFolderWithRetentionTimeCSV(@"G:\Thibault\-=Proteomics_Raw_Data=-\Tyers_ProhitsStorage\QEXACTIVE\Cdc34-Ubi\SEP12_2013\DSS\PeptidesMaps\100000\inter\Cdc34-Ubi_DSS_2013-09-12_grouped_f2_fp0.01_intra-protein-cl.csv",
-                                                                               @"G:\Thibault\-=Proteomics_Raw_Data=-\Tyers_ProhitsStorage\QEXACTIVE\Cdc34-Ubi\SEP12_2013\DSS\",
-                                                                               @"G:\Thibault\-=Proteomics_Raw_Data=-\Tyers_ProhitsStorage\QEXACTIVE\Cdc34-Ubi\SEP12_2013\DSS\PeptidesMaps\100000\inter\Cdc34-Ubi_DSS_2013-09-12_grouped_f2_fp0.01_intra-protein-cl_WithRT.csv");
-                                                                     //*/
-
-            //IsomericPeptideQuantifier.OptimizeThisMaxFlow();
-            //IsomericPeptideQuantifier2.Optimize2();
-            //Tests.MatchPeptideToProtein();
-            //HistonePositionnalIsomer.Launch();
-            //PositionnalIsomerSolver.MaxFlowThis();
-            //ToCalibrate.Launch();
-            //NBSample.MaxFlowThis2();
-            //NBSample.Launch2();
-            //Tests.YangLiuPeptidesWithAllProteins();
-            //Tests.LysineConservation();
-            //NoEnzymeDigestUnitTest.Run();
-            //Instance.MhcSampleTest(null); 
-            //Instance.YeastSampleTest(null);
-            //Tests.LysineConservation();
-            //Tests.MascotCompare();
-            
-            // Initialize the server on port 81, accept any IPs, and bind events.
-            var aServer = new WebSocketServer(81, IPAddress.Any)
+            var server = new WebSocketServer("ws://localhost:8181");
+            server.Start(socket =>
             {
-                OnReceive = OnReceive,
-                OnSend = OnSend,
-                OnConnected = OnConnect,
-                OnDisconnect = OnDisconnect,
-                TimeOut = new TimeSpan(150, 0, 0)
-            };
-
-            aServer.Start();
-
+                socket.OnOpen = () =>
+                {
+                    SendRegisterInfo(socket);
+                };
+                socket.OnClose = () =>
+                {
+                    OnDisconnect(socket);
+                };
+                socket.OnMessage = message =>
+                {
+                    OnReceive(socket, message);                    
+                };
+            });
+            
             Sol.WriteLine("Welcome to ConSOLe : the command line, server-side interface of Trinity!");
             Sol.WriteLine("Type in the commands you wish to be executed");
             
@@ -156,58 +87,46 @@ namespace Afinity
             while (command != null && string.Compare(command, "exit") != 0);
 
             Sol.WriteLine("---+---+--+--+-+-      ProteoProfile will now close     -+-+--+--+---+---");
-            Sol.UpdateLogFile();
-
-            aServer.Stop();
+            Sol.UpdateLogFile();                        
         }
         
-        /// <summary>
-        /// Event fired when a client connects to the Alchemy Websockets server instance.
-        /// Adds the client to the online users list.
-        /// </summary>
-        /// <param name="context">The user's connection context</param>
-        public static void OnConnect(UserContext context)
-        {
-            Sol.WriteLine("Client Connection From : " + context.ClientAddress);            
-            OnlineUsers.TryAdd(context, String.Empty);
-        }
-
         /// <summary>
         /// Event fired when a data is received from the Alchemy Websockets server instance.
         /// Parses data as JSON and calls the appropriate message or sends an error message.
         /// </summary>
         /// <param name="context">The user's connection context</param>
-        public static void OnReceive(UserContext context)
+        public static void OnReceive(IWebSocketConnection socket, string message)
         {
           //  Sol.OutputLine("Received Data From :" + context.ClientAddress);
 
             try
             {
-                var user = OnlineUsers.Keys.Where(o => o.ClientAddress == context.ClientAddress).Single();
-                if (user != null)
+                ConSolUser user = Sol.GetConSolUser(socket);                
+                if(user == null)
                 {
-                    //Sol.OutputLine("-----------------JSON Data------------------");
-                    //Sol.OutputLine(context.DataFrame.ToString());
-                    //Sol.OutputLine("-----------------   END   ------------------");
-
-                    var json = context.DataFrame.ToString();
-
+                    if(!message.Contains("Register"))
+                        SendRegisterInfo(socket);
+                    else
+                    {                    
+                        dynamic obj = JsonConvert.DeserializeObject(message);
+                        if(((string)obj.Type).CompareTo("Register") == 0)                            
+                            Register(obj.Name.Value, socket);
+                    }
+                }
+                else
+                {
                     // <3 dynamics
-                    dynamic obj = JsonConvert.DeserializeObject(json);
+                    dynamic obj = JsonConvert.DeserializeObject(message);
 
                     switch ((string)obj.Type)
                     {
-                        case "Register":
-                            Register(obj.Name.Value, context);
-                            break;
                         case "Message":
-                            ChatMessage(obj.Message.Value, context);
                             break;
                         case "Menu":
-                            DisplayMenu(obj.Message.Value, context);
                             break;
                         case "Command":
-                            Execute(obj.Command.Value, context);
+                            Execute(obj.Command.Value, user);
+                                SendError("You must log in if you want to send commands to the Trinity Server", socket);
                             //Sol.Execute(obj.Command.Value);
                             break;
                         case "NameChange":
@@ -218,9 +137,9 @@ namespace Afinity
             }
             catch (Exception e) // Bad JSON! For shame.
             {
-                Console.WriteLine("Received uninterpretable data from " + context.ClientAddress);
-                if (context.DataFrame != null)
-                    Console.WriteLine(" => " + context.DataFrame.ToString());
+                Console.WriteLine("Received uninterpretable data from " + socket.ConnectionInfo);
+                if (!string.IsNullOrEmpty(message))
+                    Console.WriteLine(" => " + message);
                 //var r = new Response { Type = "Error", Message = e.Message };
                 //SendError(JsonConvert.SerializeObject(r), context);
                 //context.Send(JsonConvert.SerializeObject(r));
@@ -232,24 +151,20 @@ namespace Afinity
         /// Logs the data to the console and performs no further action.
         /// </summary>
         /// <param name="context">The user's connection context</param>
-        public static void OnSend(UserContext context)
+        public static int SendToTerminal(string message, IWebSocketConnection socket)
         {
-          //  Sol.OutputLine("Data Send To : " + context.ClientAddress);
-        }
-
-        /// <summary>
-        /// Event fired when the Alchemy Websockets server instance sends data to a client.
-        /// Logs the data to the console and performs no further action.
-        /// </summary>
-        /// <param name="context">The user's connection context</param>
-        public static int SendToTerminal(string message, UserContext context)
-        {
-            var u = OnlineUsers.Keys.Where(o => o.ClientAddress == context.ClientAddress).Single();
-
             //Properties
             var r = new Response { Type = "Info", Message = message };
+            socket.Send(JsonConvert.SerializeObject(r));
+            return 1;
+        }
+        
+        public static int SendRegisterInfo(IWebSocketConnection socket)
+        {
+            //Properties
+            var r = new Response { Type = "Register", Data = { } };
 
-            context.Send(JsonConvert.SerializeObject(r));
+            socket.Send(JsonConvert.SerializeObject(r));
             return 1;
         }
 
@@ -258,14 +173,12 @@ namespace Afinity
         /// Logs the data to the console and performs no further action.
         /// </summary>
         /// <param name="context">The user's connection context</param>
-        public static int SendDataToClient(object serializableObj, UserContext context)
+        public static int SendDataToClient(object serializableObj, IWebSocketConnection socket)
         {
-            var u = OnlineUsers.Keys.Where(o => o.ClientAddress == context.ClientAddress).Single();
-
             //Properties
             var r = new Response { Type = "Data", Data = serializableObj };
 
-            context.Send(JsonConvert.SerializeObject(r));
+            socket.Send(JsonConvert.SerializeObject(r));
             return 1;
         }
 
@@ -275,35 +188,17 @@ namespace Afinity
         /// to all connected users.
         /// </summary>
         /// <param name="context">The user's connection context</param>
-        public static void OnDisconnect(UserContext context)
+        public static void OnDisconnect(IWebSocketConnection socket)
         {
             try
             {
-                Sol.WriteLine("Client Disconnected : " + context.ClientAddress);
-            
-                var user = OnlineUsers.Keys.Where(o => o.ClientAddress == context.ClientAddress).Single();
+                Sol.WriteLine("Client Disconnected : " + socket.ConnectionInfo);
 
-                string trash; // Concurrent dictionaries make things weird
-                OnlineUsers.TryRemove(user, out trash);
-
-                ConSolUser userCS = Sol.RemoveUserConSol(context);//TODO pass name or context?
-
-                if (userCS != null)
-                {
-                    string msg = "User " + userCS.Name + " disconnected";
-                    var r = new Response { Type = "Disconnect", Data = new { userCS.Name }, Message = msg };
-
-                    Broadcast(JsonConvert.SerializeObject(r));
-                }
-                //BroadcastNameList();
+                Sol.RemoveUserConSol(socket);
             }
             catch (Exception e) // Disconnection not valid
             {
-                Sol.WriteLine("Could not Disconnect client");
-
-                var r = new Response { Type = "Error", Message = e.Message };
-
-                context.Send(JsonConvert.SerializeObject(r));
+                Sol.WriteLine("Could not Disconnect client : " + socket.ConnectionInfo);
             }
         }
 
@@ -312,89 +207,21 @@ namespace Afinity
         /// </summary>
         /// <param name="name">The name to register the user under</param>
         /// <param name="context">The user's connection context</param>
-        private static void Register(string name, UserContext context)
+        private static void Register(string name, IWebSocketConnection socket)
         {
-            var u = OnlineUsers.Keys.Where(o => o.ClientAddress == context.ClientAddress).Single();
-            var r = new Response();
-
             if (ValidateName(name))
             {
-                Sol.CreateUserConSol(context, name, SendToTerminal);
+                Sol.CreateUserConSol(socket, name, SendToTerminal);
 
+                var r = new Response();
                 r.Type = "Connection";
                 r.Data = new { name };
                 r.Message = "User " + name + " is now connected";
                  
                 Broadcast(JsonConvert.SerializeObject(r));
-
-                BroadcastNameList();
-                OnlineUsers[u] = name;
             }
             else
-            {
-                SendError("Selected name is not accepted", context);
-            }
-        }
-
-        /// <summary>
-        /// Broadcasts a chat message to all online users
-        /// </summary>
-        /// <param name="message">The chat message to be broadcasted</param>
-        /// <param name="context">The user's connection context</param>
-        private static void ChatMessage(string message, UserContext context)
-        {
-            var u = OnlineUsers.Keys.Where(o => o.ClientAddress == context.ClientAddress).Single();
-            string name = OnlineUsers[u];
-            var r = new Response { Type = "Message", Data = new { name } , Message = message  };
-
-            Broadcast(JsonConvert.SerializeObject(r));
-        }
-
-        /// <summary>
-        /// Return the menu options of a particular context
-        /// </summary>
-        /// <param name="message">The current page's context</param>
-        /// <param name="context">The user's connection context</param>
-        private static void DisplayMenu(string page, UserContext context)
-        {
-            var u = OnlineUsers.Keys.Where(o => o.ClientAddress == context.ClientAddress).Single();
-            string methods = "";
-
-            //Properties
-            System.Reflection.MethodInfo[] methodArray = Instance.GetType().GetMethods();//Use flags to restrict power for certain users
-            foreach (System.Reflection.MethodInfo method in methodArray)
-                methods += ", " + method.Name;
-            if (!string.IsNullOrEmpty(methods))
-                methods = methods.Substring(1);
-            string msg = "Available methods : " + methods;
-            var r = new Response { Type = "Menu", Data = methods, Message = msg};
-
-            context.Send(JsonConvert.SerializeObject(r));
-        }
-
-        /// <summary>
-        /// Broadcasts an error message to the client who caused the error
-        /// </summary>
-        /// <param name="errorMessage">Details of the error</param>
-        /// <param name="context">The user's connection context</param>
-        private static void SendError(string errorMessage, UserContext context)
-        {
-            var r = new Response { Type = "Error", Message = errorMessage };
-
-            context.Send(JsonConvert.SerializeObject(r));
-        }
-
-        /// <summary>
-        /// Broadcasts a list of all online users to all online users
-        /// </summary>
-        private static void BroadcastNameList()
-        {
-            var r = new Response
-            {
-                Type = "UserCount",
-                Data = new { Users = OnlineUsers.Values.Where(o => !String.IsNullOrEmpty(o)).ToArray() }
-            };
-            Broadcast(JsonConvert.SerializeObject(r));
+                SendError("Selected name is not accepted", socket);
         }
 
         /// <summary>
@@ -402,20 +229,24 @@ namespace Afinity
         /// </summary>
         /// <param name="message">Message to be broadcast</param>
         /// <param name="users">Optional list of users to broadcast to. If null, broadcasts to all. Defaults to null.</param>
-        private static void Broadcast(string message, ICollection<UserContext> users = null)
+        private static void Broadcast(string message)
         {
-            if (users == null)
-            {
-                foreach (var u in OnlineUsers.Keys)
-                    u.Send(message);
-            }
-            else
-            {
-                foreach (var u in OnlineUsers.Keys.Where(users.Contains))
-                    u.Send(message);
-            }
+            foreach (ConSolUser user in Sol.GetAllConnectedClients())
+                user.Context.Send(message);
         }
 
+        /// <summary>
+        /// Broadcasts an error message to the client who caused the error
+        /// </summary>
+        /// <param name="errorMessage">Details of the error</param>
+        /// <param name="context">The user's connection context</param>
+        private static void SendError(string errorMessage, IWebSocketConnection socket)
+        {
+            var r = new Response { Type = "Error", Message = errorMessage };
+
+            socket.Send(JsonConvert.SerializeObject(r));
+        }
+        
         /// <summary>
         /// Checks validity of a user's name
         /// </summary>
@@ -469,7 +300,7 @@ namespace Afinity
         /// User launching the method
         /// TODO Console outputs generated by commands of this user should be available to this user only, and flaged appropriatly in the Logs
         /// </param>
-        public static void Execute(string command, UserContext context)
+        public static void Execute(string command, ConSolUser user)
         {
             try
             {
@@ -488,7 +319,7 @@ namespace Afinity
                                 if(tttype.IsClass && tttype.IsPublic && (splits.Length == 1 || tttype.FullName.Contains(splits[1])))
                                     strCommands += "\n" + tttype.Name;
                             if(!string.IsNullOrEmpty(strCommands))
-                                SendToTerminal(strCommands.Substring(1), context);
+                                SendToTerminal(strCommands.Substring(1), user.Context);
                         }
                         else
                         {
@@ -516,26 +347,26 @@ namespace Afinity
                                 theMethod = theType.GetMethod(methodName);
                                 object result = null;
                                 if (theMethod != null)
-                                    result = theMethod.Invoke(Instance, new[] { Sol.GetConSolUser(context) });
+                                    result = theMethod.Invoke(Instance, new[] { user });
                                 else
-                                    SendError("Could not find method " + className + "." + methodName + "(ConSolUser user)", context);
+                                    SendError("Could not find method " + className + "." + methodName + "(ConSolUser user)", user.Context);
 
                                 if (result != null)
-                                    SendDataToClient(result, context);                                
+                                    SendDataToClient(result, user.Context);                                
                             }
                             else
-                                SendError("Could not find class " + command, context);
+                                SendError("Could not find class " + command, user.Context);
                         }
                     }
                     catch (Exception)
                     {
-                        SendError("Could not run command", context);
+                        SendError("Could not run command", user.Context);
                     }
                 });
             }
             catch (Exception)
             {
-                SendError("Could not run command", context);
+                SendError("Could not run command", user.Context);
             }
         }
     }
