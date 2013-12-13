@@ -55,6 +55,19 @@ namespace Afinity
         /// <param name="args"></param>
         static void Main(string[] args)
         {
+            HistonePositionnalIsomer.MonoAce(new ConSol());
+            /*
+            Proteomics.Utilities.Fasta.FastaRead.MergeSequences(@"C:\_IRIC\Data\MiHAs\PersonnalizedGenomes\C");
+            Proteomics.Utilities.Fasta.FastaRead.MergeSequences(@"C:\_IRIC\Data\MiHAs\PersonnalizedGenomes\CELG");
+            Proteomics.Utilities.Fasta.FastaRead.MergeSequences(@"C:\_IRIC\Data\MiHAs\PersonnalizedGenomes\J");
+            Proteomics.Utilities.Fasta.FastaRead.MergeSequences(@"C:\_IRIC\Data\MiHAs\PersonnalizedGenomes\MA");
+            Proteomics.Utilities.Fasta.FastaRead.MergeSequences(@"C:\_IRIC\Data\MiHAs\PersonnalizedGenomes\PF");
+            Proteomics.Utilities.Fasta.FastaRead.MergeSequences(@"C:\_IRIC\Data\MiHAs\PersonnalizedGenomes\RT");//*/
+            //Proteomics.Utilities.Fasta.FastaRead.FastaQToSmallFasta(@"C:\_IRIC\Data\Poisson\");
+            //Proteomics.Utilities.Fasta.FastaRead.ShuffleSequences(@"G:\Thibault\Frederic Lamoliatte\Database\uniproute_Homo_SProt_ForwardOnly.fasta");
+            //YeastSample.Launch(new ConSol());
+            return;
+
             Sol = new ConSol();                    
             string command = "";
 
