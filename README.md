@@ -1,4 +1,4 @@
-Trinity.Server
+PeptidAce.Server
 ==============
 
-Server specific code (Websocket and JSON specific stuff) for the Trinity Project
+Server specific code (Websocket and JSON specific stuff) for PeptidAce
