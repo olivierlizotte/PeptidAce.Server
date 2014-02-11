@@ -24,15 +24,15 @@ using Newtonsoft.Json;
 using System.Net;
 using System.Threading.Tasks;
 using System.Timers;
-using Trinity.UnitTest;
 using Fleck;
+using PeptidAce.Utilities.Interfaces;
 
-namespace Afinity
+namespace PeptidAce
 {
     /// <summary>
     /// Main class with websocket initialisation. Also creates a ConSole object to handle log files generation and 
     /// </summary>
-    public class TrinityMain
+    public class AceServer
     {
         /// <summary>
         /// Store the list of online users. Wish I had a ConcurrentList. 
@@ -42,12 +42,12 @@ namespace Afinity
         /// <summary>
         /// Console wrapper with integrated log files and command compiler (through reflection)
         /// </summary>
-        public static ConSol Sol;
+        public static ConSolServer Sol;
 
         /// <summary>
         /// Pointer to an instance of the main class
         /// </summary>
-        public static TrinityMain Instance = new TrinityMain();
+        public static AceServer Instance = new AceServer();
 
         /// <summary>
         /// Initialize the application and start the Alchemy Websockets server
@@ -55,20 +55,20 @@ namespace Afinity
         /// <param name="args"></param>
         static void Main(string[] args)
         {
-            HistonePositionnalIsomer.MonoAce(new ConSol());
-            /*
-            Proteomics.Utilities.Fasta.FastaRead.MergeSequences(@"C:\_IRIC\Data\MiHAs\PersonnalizedGenomes\C");
-            Proteomics.Utilities.Fasta.FastaRead.MergeSequences(@"C:\_IRIC\Data\MiHAs\PersonnalizedGenomes\CELG");
-            Proteomics.Utilities.Fasta.FastaRead.MergeSequences(@"C:\_IRIC\Data\MiHAs\PersonnalizedGenomes\J");
-            Proteomics.Utilities.Fasta.FastaRead.MergeSequences(@"C:\_IRIC\Data\MiHAs\PersonnalizedGenomes\MA");
-            Proteomics.Utilities.Fasta.FastaRead.MergeSequences(@"C:\_IRIC\Data\MiHAs\PersonnalizedGenomes\PF");
-            Proteomics.Utilities.Fasta.FastaRead.MergeSequences(@"C:\_IRIC\Data\MiHAs\PersonnalizedGenomes\RT");//*/
+            //HistonePositionnalIsomer.MonoAce(new ConSol());
+            
+            //Proteomics.Utilities.Fasta.FastaRead.MergeSequences(@"C:\_IRIC\Data\MiHAs\PersonnalizedGenomes\C");
+            //Proteomics.Utilities.Fasta.FastaRead.MergeSequences(@"C:\_IRIC\Data\MiHAs\PersonnalizedGenomes\CELG");
+            //Proteomics.Utilities.Fasta.FastaRead.MergeSequences(@"C:\_IRIC\Data\MiHAs\PersonnalizedGenomes\J");
+            //Proteomics.Utilities.Fasta.FastaRead.MergeSequences(@"C:\_IRIC\Data\MiHAs\PersonnalizedGenomes\MA");
+            //Proteomics.Utilities.Fasta.FastaRead.MergeSequences(@"C:\_IRIC\Data\MiHAs\PersonnalizedGenomes\PF");
+            //Proteomics.Utilities.Fasta.FastaRead.MergeSequences(@"C:\_IRIC\Data\MiHAs\PersonnalizedGenomes\RT");//*/
             //Proteomics.Utilities.Fasta.FastaRead.FastaQToSmallFasta(@"C:\_IRIC\Data\Poisson\");
             //Proteomics.Utilities.Fasta.FastaRead.ShuffleSequences(@"G:\Thibault\Frederic Lamoliatte\Database\uniproute_Homo_SProt_ForwardOnly.fasta");
             //YeastSample.Launch(new ConSol());
-            return;
+            //return;
 
-            Sol = new ConSol();                    
+            Sol = new ConSolServer();                    
             string command = "";
 
             var server = new WebSocketServer("ws://localhost:8181");
@@ -88,7 +88,7 @@ namespace Afinity
                 };
             });
             
-            Sol.WriteLine("Welcome to ConSOLe : the command line, server-side interface of Trinity!");
+            Sol.WriteLine("Welcome to ConSOLe : the command line, server-side interface of PeptidAce!");
             Sol.WriteLine("Type in the commands you wish to be executed");
             
             do
@@ -139,7 +139,7 @@ namespace Afinity
                             break;
                         case "Command":
                             Execute(obj.Command.Value, user);
-                                SendError("You must log in if you want to send commands to the Trinity Server", socket);
+                                SendError("You must log in if you want to send commands to the PeptidAce Server", socket);
                             //Sol.Execute(obj.Command.Value);
                             break;
                         case "NameChange":
@@ -151,6 +151,7 @@ namespace Afinity
             catch (Exception e) // Bad JSON! For shame.
             {
                 Console.WriteLine("Received uninterpretable data from " + socket.ConnectionInfo);
+                Console.WriteLine(e.StackTrace);
                 if (!string.IsNullOrEmpty(message))
                     Console.WriteLine(" => " + message);
                 //var r = new Response { Type = "Error", Message = e.Message };
@@ -212,6 +213,7 @@ namespace Afinity
             catch (Exception e) // Disconnection not valid
             {
                 Sol.WriteLine("Could not Disconnect client : " + socket.ConnectionInfo);
+                Console.WriteLine(e.StackTrace);
             }
         }
 
@@ -291,11 +293,11 @@ namespace Afinity
             //Is the command a fullname class?
             Type theType = refType.Assembly.GetType(className);
 
-            //Is the command a class in "Trinity" ?
+            //Is the command a class in "PeptidAce" ?
             if (theType == null)
-                theType = refType.Assembly.GetType("Trinity." + className);
+                theType = refType.Assembly.GetType("PeptidAce." + className);
 
-            //Is the command a class in another Trinity namespace?
+            //Is the command a class in another PeptidAce namespace?
             if (theType == null)
                 foreach (Type tttype in refType.Assembly.GetTypes())
                     if (tttype.Name.CompareTo(className) == 0)
@@ -321,7 +323,7 @@ namespace Afinity
                 {
                     try
                     {
-                        Type refType = typeof(Trinity.Peptide);
+                        Type refType = typeof(PeptidAce.Structures.Spectrum);
                         string[] splits = command.Split(' ');
 
                         //List all possible classes, filter by keyword (second param)

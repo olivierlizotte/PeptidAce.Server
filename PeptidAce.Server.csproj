@@ -8,8 +8,8 @@
     <ProjectGuid>{48319484-324E-49B1-BF63-918CAB14687A}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Afinity_Server</RootNamespace>
-    <AssemblyName>Afinity_Server</AssemblyName>
+    <RootNamespace>PeptidAce</RootNamespace>
+    <AssemblyName>PeptidAce.Server</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -58,9 +58,6 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Alchemy">
-      <HintPath>..\packages\Alchemy.2.2.1\lib\net40\Alchemy.dll</HintPath>
-    </Reference>
     <Reference Include="Fleck">
       <HintPath>..\packages\Fleck.0.9.7.24\lib\net40\Fleck.dll</HintPath>
     </Reference>
@@ -80,6 +77,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConSolUser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -92,17 +90,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Proteomics.Utilities\Proteomics.Utilities.csproj">
-      <Project>{37EE0D82-2AE8-4212-A111-A0FACF576965}</Project>
-      <Name>Proteomics.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Trinity.ConSol\Trinity.ConSol.csproj">
-      <Project>{40AAE3FB-98BA-41EC-8120-DAF55D313285}</Project>
-      <Name>Trinity.ConSol</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Trinity.Main\Trinity.Main.csproj">
-      <Project>{BE009560-23A6-4A75-8D9A-D1C651F18E17}</Project>
-      <Name>Trinity.Main</Name>
+    <ProjectReference Include="..\PeptidAce.Library\PeptidAce.Library.csproj">
+      <Project>{be009560-23a6-4a75-8d9a-d1c651f18e17}</Project>
+      <Name>PeptidAce.Library</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
