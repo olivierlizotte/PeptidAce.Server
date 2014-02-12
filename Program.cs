@@ -35,11 +35,6 @@ namespace PeptidAce
     public class AceServer
     {
         /// <summary>
-        /// Store the list of online users. Wish I had a ConcurrentList. 
-        /// </summary>
-        //protected static ConcurrentDictionary<IWebSocketConnection, ConSolUser> OnlineUsers = new ConcurrentDictionary<IWebSocketConnection, ConSolUser>();
-                
-        /// <summary>
         /// Console wrapper with integrated log files and command compiler (through reflection)
         /// </summary>
         public static ConSolServer Sol;
@@ -55,18 +50,6 @@ namespace PeptidAce
         /// <param name="args"></param>
         static void Main(string[] args)
         {
-            //HistonePositionnalIsomer.MonoAce(new ConSol());
-            
-            //Proteomics.Utilities.Fasta.FastaRead.MergeSequences(@"C:\_IRIC\Data\MiHAs\PersonnalizedGenomes\C");
-            //Proteomics.Utilities.Fasta.FastaRead.MergeSequences(@"C:\_IRIC\Data\MiHAs\PersonnalizedGenomes\CELG");
-            //Proteomics.Utilities.Fasta.FastaRead.MergeSequences(@"C:\_IRIC\Data\MiHAs\PersonnalizedGenomes\J");
-            //Proteomics.Utilities.Fasta.FastaRead.MergeSequences(@"C:\_IRIC\Data\MiHAs\PersonnalizedGenomes\MA");
-            //Proteomics.Utilities.Fasta.FastaRead.MergeSequences(@"C:\_IRIC\Data\MiHAs\PersonnalizedGenomes\PF");
-            //Proteomics.Utilities.Fasta.FastaRead.MergeSequences(@"C:\_IRIC\Data\MiHAs\PersonnalizedGenomes\RT");//*/
-            //Proteomics.Utilities.Fasta.FastaRead.FastaQToSmallFasta(@"C:\_IRIC\Data\Poisson\");
-            //Proteomics.Utilities.Fasta.FastaRead.ShuffleSequences(@"G:\Thibault\Frederic Lamoliatte\Database\uniproute_Homo_SProt_ForwardOnly.fasta");
-            //YeastSample.Launch(new ConSol());
-            //return;
 
             Sol = new ConSolServer();                    
             string command = "";
@@ -99,7 +82,7 @@ namespace PeptidAce
             }
             while (command != null && string.Compare(command, "exit") != 0);
 
-            Sol.WriteLine("---+---+--+--+-+-      ProteoProfile will now close     -+-+--+--+---+---");
+            Sol.WriteLine("---+---+--+--+-+-      PeptidAce will now close     -+-+--+--+---+---");
             Sol.UpdateLogFile();                        
         }
         
