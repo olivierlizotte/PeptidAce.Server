@@ -50,8 +50,99 @@ namespace PeptidAce
         /// <param name="args"></param>
         static void Main(string[] args)
         {
+            Sol = new ConSolServer();
 
-            Sol = new ConSolServer();                    
+
+            /*
+            DBOptions options = DistillerReplacement.CreateOptions(@"G:\Thibault\Olivier\Databases\UniprotHuman1302S.fasta", 
+                                                                   @"G:\Thibault\Olivier\DistillerReplacement\PeptidAceSearch",
+                                                                   12,
+                                                                   0.02,
+                                                                   Sol);
+            options.OutputFolder = @"G:\Thibault\Olivier\DistillerReplacement\PeptidAceSearch";
+            Samples samples = new Samples(options);
+            samples.Add(new Sample(1,1,1, @"G:\Thibault\Olivier\DistillerReplacement\FM_FL_NTA_+TBIB_membrane_1_750mM_PeptidAce_Filt100.mgf", 
+                                          @"G:\Thibault\Olivier\DistillerReplacement\FM_FL_NTA_+TBIB_membrane_1_750mM_PeptidAce_Filt100.mgf", 
+                                          0, 
+                                          "PeptidAceFilt100"));
+            Result rez = PeptidAce.Ace.Start(options, samples, false, false);
+            rez.ExportPSMs(1, @"G:\Thibault\Olivier\DistillerReplacement\PeptidAceSearch\psms_1.csv");
+            /*
+            DistillerReplacement.Run(@"C:\_IRIC\Data\Distiller\FM_FL_NTA_+TBIB_membrane_1_750mM.raw",
+                                     @"C:\_IRIC\Data\Distiller\PeptidAce\FM_FL_NTA_+TBIB_membrane_1_750mM.mgf",
+                                     new DBOptions(Sol),
+                                     true);
+            //*/
+            /*
+            PeptidAce.Dev.Methods.MatchedSpectra.CompareReports(@"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\Cluster Celine\M PeptideDb Occ10_189409_0_true.csv",
+                                                                @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\Cluster Celine\McanonicalDb_RNAseq_06feb2014_AllModif_188894_0_true.csv",
+                                                                new string[] { 
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M1_120612_F1.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M1_120612_F2.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M1_120612_F3.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M1_120612_F4.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M1_120612_F5.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M1_120612_F6.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M1_120612_F7.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M2_120628_F1.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M2_120628_F2.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M2_120628_F3.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M2_120628_F4.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M2_120628_F5.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M2_120628_F6.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M2_120628_F7.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M3_120629_F1.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M3_120629_F2.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M3_120629_F3.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M3_120629_F4.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M3_120629_F5.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M3_120629_F6.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M3_120629_F7.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M4_120630_F1.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M4_120630_F2.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M4_120630_F3.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M4_120630_F4.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M4_120630_F5.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M4_120630_F6.raw",
+                                                                    @"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\JUN27_2012\MR 4Rep DS\DS_M4_120630_F7.raw"
+                                                                },
+                                                                @"C:\_IRIC\Data\MiHAs\ComparisonForCeline.csv",
+                                                                Sol);//*/
+
+            /*PeptidAce.Utilities.Methods.Alignator.Align(@"C:\_IRIC\Data\Eric\Sumo\Align\SUMO_MG132_240414_9.raw",
+                                                            @"C:\_IRIC\Data\Eric\Sumo\Align\SUMO_MG132_240414_9_shifted10ppm.mgf", 10);//,
+                                                            //@"C:\_IRIC\Data\Eric\Sumo\Align\UniprotHuman.fa");//*/
+            /*PeptidAce.Utilities.Methods.ContaminantRemoval.FromRaw(@"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\FEB19_2014\FL-blanc-Ab_140221010652.raw", new string[]{
+//@"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\FEB19_2014\FL-blanc-Ab_140221010652.raw", 
+@"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\FEB19_2014\FL-Epitomics-6peptides-50fmol-R1.raw",
+@"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\FEB19_2014\FL-Epitomics-6peptides-50fmol-R1bis.raw",
+@"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\FEB19_2014\FL-Epitomics-6peptides-50fmol-R2.raw",
+@"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\FEB19_2014\FL-Epitomics-6peptides-200fmol-R1.raw",
+@"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\FEB19_2014\FL-Epitomics-6peptides-200fmol-R2.raw",
+@"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\FEB19_2014\FL-Epitomics-6peptides-500fmol-R1.raw",
+@"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\FEB19_2014\FL-Epitomics-6peptides-500fmol-R2.raw",
+@"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\FEB19_2014\FL-Epitomics-96-HEK-500fmol-R1.raw",
+@"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\FEB19_2014\FL-Epitomics-96-HEK-500fmol-R2.raw",
+@"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\FEB19_2014\FL-Epitomics-96-only-500fmol-R1.raw",
+@"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\FEB19_2014\FL-Epitomics-96-only-500fmol-R2.raw"}
+);//*/
+            //PeptidAce.Dev.Samples.Yeast.Launch(Sol);
+            //PeptidAce.Utilities.Tools.MascotXML.SeparateFile(@"C:\_IRIC\Data\Sumo\F189478.xml");
+            //PeptidAce.Methods.RawRtExtractor.FromFolderToCSV(@"G:\Thibault\-=Proteomics_Raw_Data=-\Tyers_ProhitsStorage\QEXACTIVE\Cdc34-Ubi\NOV24_2013\");
+            /*PeptidAce.Methods.AddRtToMascotReport.FromFolderWithRetentionTimeCSV(
+            @"G:\Thibault\-=Proteomics_Raw_Data=-\Tyers_ProhitsStorage\QEXACTIVE\Cdc34-Ubi\NOV24_2013\PeptidesMaps\100000\MascotReport_Dataset_CLPeptide_q_Cdc34_Ub_dataset__id__exact_178.csv",
+            @"G:\Thibault\-=Proteomics_Raw_Data=-\Tyers_ProhitsStorage\QEXACTIVE\Cdc34-Ubi\NOV24_2013\",
+            @"G:\Thibault\-=Proteomics_Raw_Data=-\Tyers_ProhitsStorage\QEXACTIVE\Cdc34-Ubi\NOV24_2013\PeptidesMaps\100000MascotReport_Dataset_CLPeptide_q_Cdc34_Ub_dataset__id__exact_178_WithRt.csv");//*/
+            
+            //PeptidAce.Utilities.Fasta.FastaHelper.AppendProteinDescriptionToMascotReport(@"C:\Users\caronlio\Downloads\Rgenome RNAseq only DB cluster_all BS_matrix_Olivier.csv",
+            //                                                                            @"G:\Thibault\Olivier\Databases\lightR_transcriptome_2013-11-5_WithReverse.fasta",
+            //                                                                            @"C:\Users\caronlio\Downloads\Rgenome RNAseq only DB cluster_all BS_matrix_Olivier_WithProtDesc.csv");
+            //Sample command: PeptidAce.Iso.UnitTest.HistonePositionnalIsomer.AnnotatedSpectrumSample
+            //Numerics.SourceStore.FillStore(@"G:\Thibault\-=Proteomics_Raw_Data=-\ELITE\DEC09_2013", Numerics.SourceStore.GetDictionary());
+
+            //Numerics.SequenceStore store = Numerics.SequenceStore.GetStore(0.05);
+            //store.BuildStore(8, 11);
+            //return;
             string command = "";
 
             var server = new WebSocketServer("ws://localhost:8181");
@@ -121,9 +212,20 @@ namespace PeptidAce
                         case "Menu":
                             break;
                         case "Command":
-                            Execute(obj.Command.Value, user);
+                            if (user == null || string.IsNullOrEmpty(user.Name))
                                 SendError("You must log in if you want to send commands to the PeptidAce Server", socket);
+                            else
+                                Execute(obj.Command.Value, user);
                             //Sol.Execute(obj.Command.Value);
+                            break;
+                        case "DisplaySpectrum":
+                            if (obj.Data.length > 2)
+                                ShowSpectrum(obj.Data[0], obj.Data[1], obj.Data[2], user);
+                            else
+                                ShowSpectrum(obj.Data[0], obj.Data[1], "", user);
+                            break;
+                        case "ListSources":
+                            ListSources(user);
                             break;
                         case "NameChange":
                             //NameChange(obj.Name.Value, context);
@@ -170,10 +272,10 @@ namespace PeptidAce
         /// Logs the data to the console and performs no further action.
         /// </summary>
         /// <param name="context">The user's connection context</param>
-        public static int SendDataToClient(object serializableObj, IWebSocketConnection socket)
+        public static int SendDataToClient(object serializableObj, IWebSocketConnection socket, string type = "Data")
         {
             //Properties
-            var r = new Response { Type = "Data", Data = serializableObj };
+            var r = new Response { Type = type, Data = serializableObj };
 
             socket.Send(JsonConvert.SerializeObject(r));
             return 1;
@@ -189,9 +291,8 @@ namespace PeptidAce
         {
             try
             {
-                Sol.WriteLine("Client Disconnected : " + socket.ConnectionInfo);
-
                 Sol.RemoveUserConSol(socket);
+                Sol.WriteLine("Client Disconnected : " + socket.ConnectionInfo.Host);
             }
             catch (Exception e) // Disconnection not valid
             {
@@ -286,6 +387,73 @@ namespace PeptidAce
                     if (tttype.Name.CompareTo(className) == 0)
                         theType = tttype;
             return theType;
+        }
+
+        /// <summary>
+        /// Launches, on a different thread, the method stored in "command". This method must be from the MenuFunctions class object
+        /// </summary>
+        /// <param name="command">
+        /// Name of the method to execute (must be part of MenuFunctions)
+        /// </param>
+        /// <param name="context">
+        /// User launching the method
+        /// TODO Console outputs generated by commands of this user should be available to this user only, and flaged appropriatly in the Logs
+        /// </param>
+        public static void ShowSpectrum(string source, string scan, string sequence, ConSolUser user)
+        {
+            try
+            {
+                Task task = Task.Factory.StartNew(() =>
+                {
+                    try
+                    {
+                        object result = SpectrumView.Viewer.CreateView(source, scan, user);
+                        SendDataToClient(result, user.Context, "AnnotatedSpectrum");    
+                    }
+                    catch (Exception)
+                    {
+                        SendError("Could not run command", user.Context);
+                    }
+                });
+            }
+            catch (Exception)
+            {
+                SendError("Could not run command", user.Context);
+            }
+        }
+
+        /// <summary>
+        /// Launches, on a different thread, the method stored in "command". This method must be from the MenuFunctions class object
+        /// </summary>
+        /// <param name="command">
+        /// Name of the method to execute (must be part of MenuFunctions)
+        /// </param>
+        /// <param name="context">
+        /// User launching the method
+        /// TODO Console outputs generated by commands of this user should be available to this user only, and flaged appropriatly in the Logs
+        /// </param>
+        public static void ListSources(ConSolUser user)
+        {
+            try
+            {
+                Task task = Task.Factory.StartNew(() =>
+                {
+                    try
+                    {
+                        List<string> list = new List<string>(Numerics.SourceStore.GetDictionary().Keys);
+                        object result = list.ToArray();
+                        SendDataToClient(result, user.Context, "ListSources");
+                    }
+                    catch (Exception)
+                    {
+                        SendError("Could not run command", user.Context);
+                    }
+                });
+            }
+            catch (Exception)
+            {
+                SendError("Could not run command", user.Context);
+            }
         }
 
         /// <summary>

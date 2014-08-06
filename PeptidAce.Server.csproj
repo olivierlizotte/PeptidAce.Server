@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PeptidAce</RootNamespace>
     <AssemblyName>PeptidAce.Server</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -26,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x64</PlatformTarget>
@@ -35,6 +36,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -45,6 +47,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -56,13 +59,21 @@
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
     <CodeAnalysisRuleSet>BasicCorrectnessRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Esent.Collections">
+      <HintPath>..\..\ASP.NET Test\first\WebApp1\packages\Microsoft.Database.Collections.Generic.1.9.1.0\lib\net40\Esent.Collections.dll</HintPath>
+    </Reference>
+    <Reference Include="Esent.Interop">
+      <HintPath>..\..\ASP.NET Test\first\WebApp1\packages\ManagedEsent.1.9.1.0\lib\net40\Esent.Interop.dll</HintPath>
+    </Reference>
     <Reference Include="Fleck">
       <HintPath>..\packages\Fleck.0.9.7.24\lib\net40\Fleck.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.5.0.8\lib\net40\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="RestSharp, Version=104.3.3.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -78,8 +89,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConSolUser.cs" />
+    <Compile Include="Numerics\SequenceStore.cs" />
+    <Compile Include="Numerics\SourceStore.cs" />
+    <Compile Include="Numerics\SpectrumStore.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SpectrumView\Data\PeptideView.cs" />
+    <Compile Include="SpectrumView\Viewer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">
@@ -90,6 +106,22 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ASP.NET Test\first\WebApp1\CMinor\CMinor.csproj">
+      <Project>{e403ab68-fa10-4146-9f83-7a6aa53d3320}</Project>
+      <Name>CMinor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ASP.NET Test\first\WebApp1\DotNetMHC\DotNetMHC.csproj">
+      <Project>{e37b67cb-5549-489b-bab2-36ebdfe98c65}</Project>
+      <Name>DotNetMHC</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ASP.NET Test\first\WebApp1\VelocityTest1\VelocityTest1.csproj">
+      <Project>{d5fb26cb-f677-4972-b2c5-56f1811b9568}</Project>
+      <Name>VelocityTest1</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\PeptidAce\PeptidAce.Dev\PeptidAce.Dev.csproj">
+      <Project>{c425bc05-585d-4771-b6d7-8b546237500c}</Project>
+      <Name>PeptidAce.Dev</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PeptidAce.Library\PeptidAce.Library.csproj">
       <Project>{be009560-23a6-4a75-8d9a-d1c651f18e17}</Project>
       <Name>PeptidAce.Library</Name>
